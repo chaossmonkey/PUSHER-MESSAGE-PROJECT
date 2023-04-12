@@ -9,14 +9,46 @@
 <h1>Messages</h1>
 <div id="messages-container"></div>
 
+<!-- Add a form with a text input and a button -->
+<form id="message-form">
+  <input type="text" id="message-input" placeholder="Type a message...">
+  <button type="submit">Send</button>
+</form>
+
 <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
 <script>
 
   var pusher = new Pusher('ea714da401dda1bea420', {
     cluster: 'ap2'
   });
-  console.log("--------"+authToken);
+
   const channel = pusher.subscribe("private-my-channel");
+
+  // Bind a function to the form's submit event
+  document.getElementById("message-form").addEventListener("submit", function(event) {
+    event.preventDefault(); // prevent page reload
+
+    // Get the value of the input
+    var message = document.getElementById("message-input").value;
+
+    // Call the POST API endpoint
+    fetch("pusher/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ message: message })
+    }).then(function(response) {
+      console.log("Message sent");
+    }).catch(function(error) {
+      console.error(error);
+    });
+
+    // Clear the input
+    document.getElementById("message-input").value = "";
+  });
+
+  // Bind a function to the "my-event" event
   channel.bind("my-event", function (data) {
     console.log("my-event triggered:");
     console.log(data);
@@ -32,4 +64,3 @@
 </script>
 </body>
 </html>
-
