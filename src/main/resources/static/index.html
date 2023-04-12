@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pusher Test</title>
+    <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
+    <script>
+        const messagesUrl = "messages.html";
+
+        document.addEventListener('DOMContentLoaded', function () {
+            Pusher.logToConsole = true;
+
+            const usernameInput = document.getElementById("username");
+            const passwordInput = document.getElementById("password");
+            const loginButton = document.getElementById("login");
+
+
+            let authToken = '';
+
+            loginButton.addEventListener
+            ("click", () => {
+                console.log("login button clicked");
+
+                const username = usernameInput.value;
+                const password = passwordInput.value;
+                const socketId = pusher.connection.socket_id;
+                const channelName = "private-my-channel";
+
+                // Send a request to the server to authenticate the user and retrieve an auth token
+                fetch(`pusher/customAuthorization?socket_id=${socketId}&channel_name=${channelName}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password,
+                    }),
+                })
+                    .then((response) => response.text())
+                    .then((authTokenResponse) => {
+                        authToken = authTokenResponse;
+                        console.log("this is authToken");
+                        console.log(authToken);
+
+                        if(authToken)
+                        {
+                            const channel = pusher.subscribe("private-my-channel", {
+                                auth: {
+                                    headers: {
+                                        "Authorization": "Bearer " + authToken,
+                                    },
+                                },
+                            });
+
+
+                            window.location.href = messagesUrl;
+                        }
+
+
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+
+            });
+            var pusher = new Pusher('ea714da401dda1bea420', {
+                cluster: 'ap2'
+                  });
+        })
+
+    </script>
+</head>
+<body>
+<h1>Pusher Test</h1>
+<p>Try publishing an event to channel <code>my-channel</code> with event name <code>my-event</code>.</p>
+<div id="messages">
+    <!-- The messages will be displayed here -->
+</div>
+<label for="username">Username:</label>
+<input type="text" id="username">
+<label for="password">Password:</label>
+<input type="password" id="password">
+<button id="login">Login</button>
+</body>
+</html>

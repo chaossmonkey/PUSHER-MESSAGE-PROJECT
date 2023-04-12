@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Messages</title>
+</head>
+<body>
+<h1>Messages</h1>
+<div id="messages-container"></div>
+
+<script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+<script>
+
+  var pusher = new Pusher('ea714da401dda1bea420', {
+    cluster: 'ap2'
+  });
+  console.log("--------"+authToken);
+  const channel = pusher.subscribe("private-my-channel");
+  channel.bind("my-event", function (data) {
+    console.log("my-event triggered:");
+    console.log(data);
+
+    let json_string = JSON.stringify(data);
+    console.log(json_string);
+
+    var message = json_string;
+    var messageElement = document.createElement("div");
+    messageElement.appendChild(document.createTextNode(message));
+    document.getElementById("messages-container").appendChild(messageElement);
+  });
+</script>
+</body>
+</html>
+
