@@ -9,7 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -81,25 +83,37 @@ public class PusherController {
     public ResponseEntity<String> authenticate(HttpServletRequest request, @RequestBody Map<String, String> credentials) {
 
 
+        Map<String,String> UserNameAndPassword=new HashMap<>();
+        UserNameAndPassword.put("rakshith","lokesh");
+
         //this the place where you check the username and password with respect to the database
         String username = credentials.get("username");
         String password = credentials.get("password");
 
-        // Check if the user is authorized to access the private channel
-        boolean isAuthorized = true;
-        if (!isAuthorized) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        if(UserNameAndPassword.get(username).equals(password))
+        {
+            boolean isAuthorized = true;
+            if (!isAuthorized) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
+            // Get the socket ID and channel name from the request parameters
+            String socketId = request.getParameter("socket_id");
+            String channelName = request.getParameter("channel_name");
+
+            System.out.println("this is the custom authorization endpoint");
+            // Generate an auth token for the user
+            String authToken = pusher.authenticate(socketId, channelName);
+            System.out.println(authToken);
+            return ResponseEntity.ok(authToken);
         }
 
-        // Get the socket ID and channel name from the request parameters
-        String socketId = request.getParameter("socket_id");
-        String channelName = request.getParameter("channel_name");
+        else
+        {
+             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
 
-        System.out.println("this is the custom authorization endpoint");
-        // Generate an auth token for the user
-        String authToken = pusher.authenticate(socketId, channelName);
-        System.out.println(authToken);
-        return ResponseEntity.ok(authToken);
+
     }
 
     @GetMapping("/my-api")
