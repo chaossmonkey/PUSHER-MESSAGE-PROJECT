@@ -1,36 +1,96 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Messages</title>
-<body>
-<h1>Messages</h1>
-<div id="messages-container"></div>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-image: url('https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=1500&h=1000&q=80');
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
 
-<!-- Add a form with a text input and a button -->
-<form id="message-form">
-  <input type="text" id="message-input" placeholder="Type a message...">
-  <button type="submit">Send</button>
-</form>
+    .container {
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 5px;
+      padding: 20px;
+      width: 500px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+h1 {
+margin-bottom: 20px;
+}
+
+#messages-container {
+height: 300px;
+overflow-y: scroll;
+border: 1px solid #ccc;
+border-radius: 3px;
+padding: 10px;
+margin-bottom: 20px;
+}
+
+form {
+display: flex;
+}
+
+input {
+flex-grow: 1;
+padding: 10px;
+border: 1px solid #ccc;
+border-radius: 3px;
+}
+
+button {
+width: 100px;
+padding: 10px;
+background-color: #007bff;
+color: white;
+border: none;
+border-radius: 3px;
+cursor: pointer;
+margin-left: 10px;
+}
+
+button:hover {
+background-color: #0056b3;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Messages</h1>
+  <div id="messages-container"></div>
+
+  <!-- Add a form with a text input and a button -->
+  <form id="message-form">
+    <input type="text" id="message-input" placeholder="Type a message...">
+    <button type="submit">Send</button>
+  </form>
+</div>
+
 
 <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
 <script>
-
   var pusher = new Pusher('ea714da401dda1bea420', {
     cluster: 'ap2'
   });
 
   const channel = pusher.subscribe("private-my-channel");
 
-  // Bind a function to the form's submit event
   document.getElementById("message-form").addEventListener("submit", function(event) {
-    event.preventDefault(); // prevent page reload
+    event.preventDefault();
 
-    // Get the value of the input
     var message = document.getElementById("message-input").value;
 
-    // Call the POST API endpoint
     fetch("pusher/messages", {
       method: "POST",
       headers: {
@@ -43,11 +103,8 @@
       console.error(error);
     });
 
-    // Clear the input
     document.getElementById("message-input").value = "";
   });
-
-  // Bind a function to the "my-event" event
   channel.bind("my-event", function (data) {
     console.log("my-event triggered:");
     console.log(data);
